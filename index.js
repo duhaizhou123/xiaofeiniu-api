@@ -1,11 +1,16 @@
 /*
  * 小肥牛扫码点餐项目API子系统
  */
+
 const PORT = 8090;
 const express = require('express');
+const categoryRouter = require('./routes/admin/category');
 
-//启动主服务
+//创建HTTP应用服务器
 var app = express();
 app.listen(PORT,()=>{
-	console.log('Server Listening '+PORT+'...');
-})
+	console.log('Server Listening: '+PORT );
+});
+
+//挂载路由器
+app.use('/admin/category',categoryRouter);
