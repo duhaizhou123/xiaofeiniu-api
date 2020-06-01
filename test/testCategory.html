@@ -16,7 +16,16 @@
 		bt1.onclick = function(){
 			axios.get('http://127.0.0.1:8090/admin/category').then((result)=>{
 				console.log('获取菜品类别成功：');
-				console.log(result);
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+		bt2.onclick = function(){
+			axios.delete('http://127.0.0.1:8090/admin/category/1').then((result)=>{
+				console.log('删除类别成功：');
+				console.log(result.data);
 			}).catch((err)=>{
 				console.log(err);
 			})
