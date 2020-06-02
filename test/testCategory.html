@@ -30,6 +30,26 @@
 				console.log(err);
 			})
 		}
+
+		bt3.onclick = function(){
+			var data = {cname: '水果'};
+			axios.post('http://127.0.0.1:8090/admin/category',data).then((result)=>{
+				console.log('添加新的类别成功');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+		bt4.onclick=function(){
+			var data = {cname: '甜点', cid: 8};
+			axios.put('http://127.0.0.1:8090/admin/category',data).then((result)=>{
+				console.log('修改菜品类别成功');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
 	</script>
 
 </body>

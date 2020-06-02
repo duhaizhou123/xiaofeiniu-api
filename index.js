@@ -5,6 +5,7 @@
 const PORT = 8090;
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const categoryRouter = require('./routes/admin/category');
 
 //创建HTTP应用服务器
@@ -15,6 +16,7 @@ app.listen(PORT,()=>{
 
 //使用中间件
 app.use(cors());
+app.use(bodyParser.json());
 
 //挂载路由器
 app.use('/admin/category',categoryRouter);

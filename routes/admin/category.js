@@ -32,6 +32,7 @@ router.delete('/:cid', (req, res) => {
 	//删除菜品类别前必须先把属于该类别菜品的类别编号设置为NULL
 	pool.query('UPDATE xfn_dish SET categoryId=NULL WHERE categoryId=?', req.params.cid, (err, result) => {
 		if (err) throw err;
+		//至此指定类别的菜品已经修改完毕
 		pool.query('DELETE FROM xfn_category WHERE cid=?',
 			req.params.cid, (err, result) => {
 				if (err) throw err;
@@ -43,8 +44,8 @@ router.delete('/:cid', (req, res) => {
 				}
 			})
 	})
-
 })
+
 /*
 *API: POST /admin/category
 *请求参数：{cname: 'xxx'}
@@ -53,6 +54,13 @@ router.delete('/:cid', (req, res) => {
 *{code: 200, msg: '1 category added', cid: x}
 *
 */
+router.post('/',(req,res)=>{
+	var data = req.body;
+	pool.query('INSERT INTO xfn_category SET ?',data,(err,result)=>{
+		if (err) throw err;
+		res.send({code: 200, msg: '1 category added',cid: result.insertId});
+	})
+})
 
 /*
 *API: PUT /admin/category
@@ -64,3 +72,17 @@ router.delete('/:cid', (req, res) => {
 *{code: 401, msg: '0 category modified, no modification'}
 *
 */
+router.put('/',(req,res)=>{
+	var data = req.body;
+	//此处可以对数据进行验证
+	pool.query('UPDATE xfn_category SET ? WHERE cid=?',[data,data.cid],(err,result)=>{
+		if (err) throw err;
+		if (result.changedRows > 0) { //实际更新了一行
+			res.send({code: 200, msg: '1 category modified'});
+		} else if(result.affectedRows == 0){
+			res.send({code: 400, msg: '0 category modified, not exists'});
+		} else if(result.affectedRows == 1 && result.changedRows == 0){
+			res.send({code: 401, msg: '0 category modified, no modification'});
+		}
+	})
+})
