@@ -77,11 +77,11 @@ router.put('/',(req,res)=>{
 	//此处可以对数据进行验证
 	pool.query('UPDATE xfn_category SET ? WHERE cid=?',[data,data.cid],(err,result)=>{
 		if (err) throw err;
-		if (result.changedRows > 0) { //实际更新了一行
+		if (result.changedRows > 0) { //修改了1行
 			res.send({code: 200, msg: '1 category modified'});
-		} else if(result.affectedRows == 0){
+		} else if(result.affectedRows == 0){ //影响了0行——修改的数据不存在
 			res.send({code: 400, msg: '0 category modified, not exists'});
-		} else if(result.affectedRows == 1 && result.changedRows == 0){
+		} else if(result.affectedRows == 1 && result.changedRows == 0){ //影响了1行，修改了0行——新值与旧值完全一样
 			res.send({code: 401, msg: '0 category modified, no modification'});
 		}
 	})
