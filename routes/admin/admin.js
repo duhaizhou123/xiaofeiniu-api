@@ -14,17 +14,17 @@ module.exports = router;
 * {code: 200, msg: 'login success'}
 * {code: 400, msg: 'aname or apwd err'}
 */
-router.post('/login',(req,res)=>{
+router.post('/login', (req, res) => {
 	var aname = req.body.aname;
 	var apwd = req.body.apwd;
 	//需要对用户输入的密码执行加密函数
-	pool.query('SELECT aid FROM xfn_admin WHERE aname=? AND apwd=PASSWORD(?)',[aname,apwd],(err,result)=>{
-		if(err) throw err;
-		if(result.length>0){
-			res.send({code: 200, msg: 'login success'});
+	pool.query('SELECT aid FROM xfn_admin WHERE aname=? AND apwd=PASSWORD(?)', [aname, apwd], (err, result) => {
+		if (err) throw err;
+		if (result.length > 0) {
+			res.send({ code: 200, msg: 'login success' });
 		} else {
-			res.send({code: 400, msg: 'aname or apwd err'});
-		}		
+			res.send({ code: 400, msg: 'aname or apwd err' });
+		}
 	})
 })
 /*
@@ -36,4 +36,27 @@ router.post('/login',(req,res)=>{
 * {code: 400, msg: 'aname or apwd err'}
 * {code: 401, msg: 'apwd not modified'}
 */
+router.patch('/', (req, res) => {
+	//查询该用户是否存在
+	pool.query('SELECT aid FROM xfn_admin WHERE aname=? AND apwd=PASSWORD(?)', [req.body.aname, req.body.oldPwd], (err, result) => {
+		if (err) throw err;
+		//用户不存在
+		if (result.length == 0) {
+			res.send({ code: 400, msg: 'aname or apwd err' });
+			return;
+		}
+		//用户存在修改其密码
+		pool.query('UPDATE xfn_admin SET apwd=PASSWORD(?) WHERE aname=?', [req.body.newPwd, req.body.aname], (err, result) => {
+			if (err) throw err;
+			//新旧密码不一样
+			if (result.changedRows > 0) {
+				res.send({ code: 200, msg: 'modified success' });
+			} else {//新旧密码一样
+				res.send({ code: 401, msg: 'apwd not modified' });
+			}
+		})
+
+	})
+
+})
 

@@ -7,15 +7,15 @@
 	<title>Document</title>
 </head>
 <body>
-	<button id='bt1'>管理员登录</button>
+	<button id='bt1'>查询所有菜品</button>
 	<button id='bt2'>修改管理员密码</button>
 	
 	<script src="./axios.min.js"></script>
 	<script>
 		bt1.onclick = function(){
-			var data = {aname: 'admin', apwd: '123456'};
-			axios.post('http://127.0.0.1:8090/admin/login',data).then((result)=>{
-				console.log('登录成功，结果为：');
+			
+			axios.get('http://127.0.0.1:8090/admin/dish').then((result)=>{
+				console.log('查询所有菜品成功，结果为：');
 				console.log(result.data);
 			}).catch((err)=>{
 				console.log(err);
