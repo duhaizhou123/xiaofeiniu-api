@@ -7,15 +7,15 @@
 	<title>Document</title>
 </head>
 <body>
-	<button id='bt1'>查询所有菜品</button>
-	<button id='bt2'>修改管理员密码</button>
+	<button id='bt1'>查询全局信息</button>
+	<button id='bt2'>修改全局信息</button>
 	
 	<script src="./axios.min.js"></script>
 	<script>
 		bt1.onclick = function(){
 			
-			axios.get('http://127.0.0.1:8090/admin/dish').then((result)=>{
-				console.log('查询所有菜品成功，结果为：');
+			axios.get('http://127.0.0.1:8090/admin/setting').then((result)=>{
+				console.log('查看全局信息成功，结果为：');
 				console.log(result.data);
 			}).catch((err)=>{
 				console.log(err);
@@ -23,9 +23,9 @@
 		}
 
 		bt2.onclick = function(){
-			var data = {aname: 'admin', oldPwd: '123456', newPwd: '654321'};
-			axios.patch('http://127.0.0.1:8090/admin',data).then((result)=>{
-				console.log('修改密码成功：');
+			var data = {appName: 'admin', apiUrl: 'xxx', adminUrl: 'xxx', appUrl: 'xxx', icp: 'xxx', copyright: 'xxx'};
+			axios.patch('http://127.0.0.1:8090/admin/setting',data).then((result)=>{
+				console.log('修改全局设置成功：');
 				console.log(result.data);
 			}).catch((err)=>{
 				console.log(err);

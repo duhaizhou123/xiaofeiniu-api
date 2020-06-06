@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+<body>
+	<button id='bt1'>查看所有菜品</button>
+
+	<hr>
+	菜品名称：<input type="text" id="inputName">
+	<input type="file"  id="inputFile">
+	<button id='bt2'>异步上传菜品图片</button>
+	<hr>
+	<button id='bt3'>新增一个菜品</button>
+	<button id='bt4'>查看某一个菜品的详细信息</button>
+	<button id='bt5'>修改某一个菜品</button>
+	<button id='bt6'>删除某一个菜品</button>
+	
+	
+	<script src="./axios.min.js"></script>
+	<script>
+		bt1.onclick = function(){
+			
+			axios.get('http://127.0.0.1:8090/admin/dish').then((result)=>{
+				console.log('查询所有菜品成功，结果为：');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+		
+		bt2.onclick = function(){
+			//异步上传文件
+			//手工创建一个multipart/form-data形式的请求主体
+			var data = new FormData();
+			//向请求主体中追加要提交的数据
+			data.append('dishName', inputName.value);
+			data.append('dishImg', inputFile.files[0]);
+
+			axios.post('http://127.0.0.1:8090/admin/dish/image',data).then((result)=>{
+				alert('异步上传菜品图片成功：');
+				alert(JSON.stringify(result.data));
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+		bt3.onclick = function(){
+			var data = {title: '五香猪蹄', imgUrl: '23544.jpg', price: 32.00, detail: '祖传秘方经过九九八十一个小时的腌制，味道绝美', categoryId: 1};
+			
+			axios.post('http://127.0.0.1:8090/admin/dish',data).then((result)=>{
+				console.log('添加菜品成功：');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+		bt4.onclick = function(){
+			axios.get('http://127.0.0.1:8090/admin/dish/1000').then((result)=>{
+				console.log('查询某一个菜品详情成功：');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+		bt5.onclick = function(){
+			var data = {did: 1, title: '五香猪蹄', imgUrl: '23544.jpg', price: 32.00, detail: '祖传秘方经过九九八十一个小时的腌制，味道绝美', categoryId: 1}
+			axios.put('http://127.0.0.1:8090/admin/dish',data).then((result)=>{
+				console.log('修改某一个菜品详情成功：');
+				console.log(result.data);
+			}).catch((err)=>{
+				console.log(err);
+			})
+		}
+
+	bt6.onclick=function(){
+		axios.delete('http://127.0.0.1:8090/admin/dish/1').then((result)=>{
+			console.log('删除某个菜品成功：');
+			console.log(result.data);
+		}).catch((err)=>{
+			console.log(err);
+		})
+	}
+
+		
+	</script>
+	
+	<hr>
+	<h3>文件上传</h3>
+	<form action="http://127.0.0.1:8090/admin/dish/image" method="post" enctype="multipart/form-data">
+		<input type="file" name="dishImg"><br>
+		菜品名称：
+		<input type="text" name="dishName"><br>
+		<input type="submit" value="上传">
+	</form>
+	
+
+</body>
+</html>
