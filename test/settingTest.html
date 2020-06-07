@@ -23,8 +23,8 @@
 		}
 
 		bt2.onclick = function(){
-			var data = {appName: 'admin', apiUrl: 'xxx', adminUrl: 'xxx', appUrl: 'xxx', icp: 'xxx', copyright: 'xxx'};
-			axios.patch('http://127.0.0.1:8090/admin/setting',data).then((result)=>{
+			var data = {appName: 'xxx', apiUrl: 'xxx', adminUrl: 'xxx', appUrl: 'xxx', icp: 'xxx', copyright: 'xxx'};
+			axios.put('http://127.0.0.1:8090/admin/setting',data).then((result)=>{
 				console.log('修改全局设置成功：');
 				console.log(result.data);
 			}).catch((err)=>{

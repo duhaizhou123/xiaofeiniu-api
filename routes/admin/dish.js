@@ -112,6 +112,8 @@ router.get('/:did',(req,res)=>{
 /**
  * API: PUT /admin/dish
  * 含义：修改某一个菜品
+ * 请求参数：
+ * {did: xx, title: 'dd', imgUrl: 'xx.jpg', price: cc,detail: 'xx', categoryId: xx }
  * 响应数据：
  * {code: 200, msg: 'dish modified success'}
  * {code: 400, msg:'dish not exists'}

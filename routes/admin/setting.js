@@ -20,14 +20,14 @@ router.get('/',(req,res)=>{
 })
 
 /*
-*API: PATCH /admin/setting
+*API: PUT /admin/setting
 *请求数据：{appName: 'xxx',apiUrl: 'xxx',..}
 *含义：修改全局设置
 *响应数据：
 *{code: 200, msg: 'modified global settings seccuss'}
 *{code: 400, msg: 'modified global settings seccuss, no modification'}
 */
-router.patch('/',(req,res)=>{
+router.put('/',(req,res)=>{
 	var data = req.body;
 	pool.query('UPDATE xfn_settings SET ?',data,(err,result)=>{
 		if(err) throw err;
