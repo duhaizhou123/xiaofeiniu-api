@@ -13,7 +13,7 @@ module.exports = router;
 * {code:200, settings:{sid: 'x',appName: 'xxx', apiUrl: 'xxx'....}}
 */
 router.get('/',(req,res)=>{
-	pool.query('SELECT sid,appName,apiUrl,adminUrl,appUrl,icp,copyRight FROM xfn_settings',(err,result)=>{
+	pool.query('SELECT sid,appName,apiUrl,adminUrl,appUrl,icp,copyright FROM xfn_settings',(err,result)=>{
 		if(err) throw err;
 		res.send({code: 200, settings:result[0]});
 	})

@@ -58,3 +58,24 @@ router.patch('/', (req, res) => {
 
 })
 
+/**
+ * API : POST /admin/loginInfo
+ * 含义：保存用户登录信息
+ * 请求数据：{adminName: 'xx', loginTime: 'xx'}
+ * 响应数据：
+ * {code: 200, message: 'recording login info success'};
+ * {code: 400, message: 'recording login info fail'};
+ * 
+ */
+router.post('/loginInfo',(req,res)=>{
+	var data = req.body;
+	pool.query('INSERT INTO xfn_login_info SET ?',data,(err,result)=>{
+		if(err) throw err;
+		if(result.changedRows>0){
+			res.send({code: 200, message: 'recording login info success'});
+		}else{
+			res.send({code: 400, message: 'recording login info fail'});
+		}
+	})
+})
+

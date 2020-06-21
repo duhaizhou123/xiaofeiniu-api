@@ -52,14 +52,21 @@ router.delete('/:cid', (req, res) => {
 *含义：添加新的菜品类别
 *响应数据：
 *{code: 200, msg: '1 category added', cid: x}
-*
+*{code: 400, msg: 'category is exists'}
 */
 router.post('/',(req,res)=>{
 	var data = req.body;
-	pool.query('INSERT INTO xfn_category SET ?',data,(err,result)=>{
-		if (err) throw err;
-		res.send({code: 200, msg: '1 category added',cid: result.insertId});
+	pool.query('SELECT cid FROM xfn_category WHERE cname=?',data.cname,(err,result)=>{
+		if(result.length>0){
+		 	res.send({code: 400, msg: 'category is exists'});
+		 }else{
+			pool.query('INSERT INTO xfn_category SET ?',data,(err,result)=>{
+				if (err) throw err;
+				res.send({code: 200, msg: '1 category added',cid: result.insertId});
+			})
+		 }
 	})
+	
 })
 
 /*
