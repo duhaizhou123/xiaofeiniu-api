@@ -4,16 +4,18 @@
 const express = require('express');
 const pool = require('../../pool');
 var router = express.Router();
+var temFile = '';
+var newFile = '';
 module.exports = router;
 
 /*
 *API: GET /admin/dish
 *含义：查询所有菜品
 *响应数据：
-* {[cid: 1, cname: '肉类', dishList:[..]],
-*  [cid: 2, cname: '蔬菜', dishList:[..]],
+* [{cid: 1, cname: '肉类', dishList:[..]},
+*  {cid: 2, cname: '蔬菜', dishList:[..]},
 *	 ...
-* }
+* ]
 */
 router.get('/', (req, res) => {
 	//查询所有菜品类别
@@ -37,7 +39,7 @@ router.get('/', (req, res) => {
 
 /**
  * API: POST /admin/dish/image
- * 含义：将客户端上传的菜品图片，保存在服务器上，返回该图片在服务器上的随机文件名
+ * 含义：将客户端上传的菜品图片，保存在服务器临时目录下，返回该图片在服务器上的随机文件名
  * 响应数据：
  * {code: 200, msg: 'upload image success',fileName:'xxx'}
  */
@@ -47,19 +49,22 @@ const multer = require('multer');
 const fs = require('fs');
 //指定客户端上传的文件临时存储路径
 var upload = multer({
-	dest: 'tem/'	
+	dest: 'public/tem/'	
 });
 
 router.post('/image', upload.single('dishImg'),(req,res)=>{
-	var temFile = req.file.path;
+	temFile = req.file.path;
 	//原始文件名的后缀
 	var suffix = req.file.originalname.slice(req.file.originalname.lastIndexOf('.')); 
-	var newFile = randFileName(suffix); //新文件名
-	//将临时文件移动至永久目录
-	fs.rename(temFile, 'img/dish/'+newFile,()=>{
-		res.send({code: 200, msg: 'upload success', fileName: newFile});
-	})
+	newFile = randFileName(suffix); //新文件名
+	//向客户端发送上传图片成功的响应消息
+	res.send({code: 200, msg: 'upload success', fileName: newFile});
 
+	//设置定时任务删除保存在临时目录下的图片
+	setTimeout(() => {
+    deleteFolder('public/tem')
+  }, 3600000);
+	
 	/**
 	 * 生成一个随机文件名方法
 	 * suffix: 文件后缀名
@@ -72,21 +77,56 @@ router.post('/image', upload.single('dishImg'),(req,res)=>{
 		var randNum = Math.floor(Math.random()*(10000-1000)+1000);
 		return dateTime+randNum+suffix;
 	}
-})
+
+	/**
+	 * 删除文件夹下所有文件方法
+	 * path： 文件夹路径
+	 */ 
+	function deleteFolder(path) {
+		var files = [];
+		if (fs.existsSync(path)) {
+			if (fs.statSync(path).isDirectory()) {
+				files = fs.readdirSync(path);
+				files.forEach(function (file, index) {
+					var curPath = path + "/" + file;
+					if (fs.statSync(curPath).isDirectory()) {
+						deleteFolder(curPath);
+					} else {
+						fs.unlinkSync(curPath);
+					}
+				});  
+    	}
+  	}
+	}
+});
 
 /**
  * API: POST /admin/dish
  * 含义：添加一个新的菜品
  * 请求数据：{title: 'xxx', imgUrl: 'xxx', price: xx.xx, detail: 'xxx', categoryId: 1}
  * 响应数据：
- * {code: 200, msg: 'added dish success', did: xx}
+ * {code: 200, msg: 'added dish success', did: xx},
+ * {code: 400,msg: 'dish is already exists'}
  */
 router.post('/',(req,res)=>{
 	var data = req.body;
-	pool.query('INSERT INTO xfn_dish SET ?',data,(err,result)=>{
+	pool.query('SELECT did FROM xfn_dish WHERE title=?',data.title,(err,result)=>{
 		if(err) throw err;
-		res.send({code: 200, msg: 'added dish success', did: result.insertId});
+		if(result.length > 0){
+			res.send({code: 400, msg: 'dish is already exists'});
+		}else{
+			pool.query('INSERT INTO xfn_dish SET ?',data,(err,result)=>{
+				if(err) throw err;
+				//数据库添加菜品成功，将菜品图片移动至永久目录
+				fs.rename(temFile, 'public/img/dish/'+newFile,()=>{
+					//返回添加菜品成功的响应消息
+					res.send({code: 200, msg: 'added dish success', did: result.insertId});
+				});
+				
+			})
+		}
 	})
+	
 })
 
 /**
@@ -123,7 +163,6 @@ router.put('/',(req,res)=>{
 	var data = req.body;
 	pool.query('UPDATE xfn_dish SET? WHERE did=?',[data,data.did],(err,result)=>{
 		if(err) throw err;
-		console.log(result);
 		if(result.affectedRows == 0){
 			res.send({code: 400, msg: 'dish not exists'});
 		} else if(result.affectedRows == 1 && result.changedRows == 0){
