@@ -12,7 +12,6 @@ module.exports = router;
  * {code: 200, tableList: [..]}
  */
 router.get('/',(req,res)=>{
-	console.log(req.params.tid);
 	pool.query('SELECT tid,tname,type,status FROM xfn_table',(err,result)=>{
 		if(err) throw err;
 		res.send({code: 200, tableList: result});

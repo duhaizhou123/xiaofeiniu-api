@@ -16,10 +16,12 @@ module.exports = router;
 */
 router.post('/login', (req, res) => {
 	//需要对用户输入的密码执行加密函数
-	pool.query('SELECT aid FROM xfn_admin WHERE aname=? AND apwd=PASSWORD(?)', [req.body.aname, req.body.apwd], (err, result) => {
+	var data = req.body;
+	pool.query('SELECT aname,role FROM xfn_admin WHERE aname=? AND apwd=PASSWORD(?)', [data.aname, data.apwd], (err, result) => {
 		if (err) throw err;
-		if (result.length > 0) {
-			res.send({ code: 200, msg: 'login success' });
+		if (result.length > 0){
+			req.session.user = result[0];
+			res.send({ code: 200, msg: 'login success', user: result[0]});
 		} else {
 			res.send({ code: 400, msg: 'aname or apwd err' });
 		}
@@ -78,4 +80,17 @@ router.post('/loginInfo',(req,res)=>{
 		}
 	})
 })
+
+/**
+ * API: GET /admin/loginOut
+ * 含义：退出登录
+ * 返回数据：{code: 200, msg: 'login out suceess'}
+ */
+
+ router.get('/loginOut',(req,res)=>{console.log(req.session);
+	 if(req.session.user){
+		 req.session.user = null;
+		 res.send({code: 200, msg: 'login out success'});
+	 }
+ })
 
